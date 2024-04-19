@@ -1,0 +1,103 @@
+---
+name: Container Scanning Action
+author: Adfinis AG
+description: TODO
+inputs:
+  image-ref:
+    description: Image to scan
+    required: true
+    type: string
+  attest:
+    description: Create an attestation using cosign
+    required: false
+    default: false
+    type: boolean
+  digest:
+    description: The images digest
+    required: false
+    type: string
+  registry:
+    description: The container registry
+    required: false
+    default: ghcr.io
+    type: string
+  token:
+    description: Github Token
+    required: true
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@0.19.0
+      with:
+        image-ref: ${{ inputs.image-ref }}
+        format: "json"
+        output: "results.json"
+
+    - name: Convert results to sarif
+      uses: aquasecurity/trivy-action@0.19.0
+      with:
+        image-ref: results.json
+        scan-type: "convert"
+        format: "sarif"
+        # skip --vuln-type arg
+        vuln-type: ""
+        output: "results.sarif"
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: "resuls.sarif"
+        token: ${{ inputs.token }}
+
+    - name: Install Cosign
+      if: ${{ inputs.attest }}
+      uses: sigstore/cosign-installer@v3.4.0
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ github.actor }}
+        password: ${{ inputs.token }}
+
+    - name: Convert trivy results to cosign-vuln
+      if: ${{ inputs.attest && !inputs.digest }}
+      uses: aquasecurity/trivy-action@0.19.0
+      with:
+        image-ref: results.json
+        scan-type: "convert"
+        format: "cosign-vuln"
+        # skip --vuln-type arg
+        vuln-type: ""
+        output: "results.cosign.json"
+
+    - name: Attach a security attestation to the signed image
+      if: ${{ inputs.attest && !inputs.digest }}
+      shell: bash
+      run: cosign attest --yes --type vuln --predicate results.cosign.json ${{ inputs.image-ref }}
+
+    - name: Sign the image with GitHub OIDC Token using cosign
+      if: ${{ inputs.attest && inputs.digest }}
+      shell: bash
+      run: |
+        cosign sign --yes ${{ inputs.image-ref }}@${{ inputs.digest }}
+
+    - name: Convert trivy results to cyclonedx
+      if: ${{ inputs.attest && inputs.digest }}
+      uses: aquasecurity/trivy-action@0.19.0
+      with:
+        image-ref: results.json
+        scan-type: "convert"
+        format: "cylonedx"
+        # skip --vuln-type arg
+        vuln-type: ""
+        output: "results.cdx"
+
+    - name: Attach an SBOM attestation to the signed images
+      if: ${{ inputs.attest && inputs.digest }}
+      shell: bash
+      run: |
+        cosign attest --yes --type cyclonedx --predicate results.cdx ${{ inputs.image-ref }}@${{ inputs.digest }}
