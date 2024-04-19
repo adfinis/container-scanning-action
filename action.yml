@@ -26,6 +26,10 @@ inputs:
     required: true
     type: string
 
+branding:
+  icon: shield
+  color: black
+
 runs:
   using: composite
   steps:
