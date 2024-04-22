@@ -19,6 +19,19 @@ jobs:
   scan:
     name: Scan image
     runs-on: ubuntu-latest
+    permissions:
+      actions: none
+      checks: none
+      contents: none
+      deployments: none
+      issues: none
+      packages: write
+      pull-requests: none
+      repository-projects: none
+      security-events: write
+      statuses: none
+      # needed for `cosign attest`
+      id-token: write
     steps:
       - uses: adfinis/container-scanning-action@main
         with:
@@ -50,7 +63,7 @@ jobs:
       packages: write
       pull-requests: none
       repository-projects: none
-      security-events: none
+      security-events: write # needed to write sarif to security tab
       statuses: none
       id-token: write # needed for signing the images with GitHub OIDC using cosign
     steps:
