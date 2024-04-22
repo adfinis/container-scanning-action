@@ -1,7 +1,10 @@
 ---
 name: Container Scanning Action
 author: Adfinis AG
-description: TODO
+description: |
+  Action for scanning containers with trivy.
+
+  Supports cosign (attestations and signing.)
 inputs:
   image-ref:
     description: Image to scan
