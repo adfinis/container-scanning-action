@@ -95,7 +95,7 @@ runs:
       with:
         image-ref: results.json
         scan-type: "convert"
-        format: "cylonedx"
+        format: "cyclonedx"
         # skip --vuln-type arg
         vuln-type: ""
         output: "results.cdx"
