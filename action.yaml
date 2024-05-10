@@ -44,7 +44,7 @@ runs:
         password: ${{ inputs.token }}
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@0.19.0
+      uses: aquasecurity/trivy-action@0.20.0
       with:
         image-ref: ${{ inputs.image-ref }}
         format: "json"
@@ -52,7 +52,7 @@ runs:
         github-pat: ${{ inputs.token }}
 
     - name: Convert results to sarif
-      uses: aquasecurity/trivy-action@0.19.0
+      uses: aquasecurity/trivy-action@0.20.0
       with:
         image-ref: results.json
         scan-type: "convert"
@@ -73,7 +73,7 @@ runs:
 
     - name: Convert trivy results to cosign-vuln
       if: ${{ inputs.attest && !inputs.digest }}
-      uses: aquasecurity/trivy-action@0.19.0
+      uses: aquasecurity/trivy-action@0.20.0
       with:
         image-ref: results.json
         scan-type: "convert"
@@ -95,7 +95,7 @@ runs:
 
     - name: Convert trivy results to cyclonedx
       if: ${{ inputs.attest && inputs.digest }}
-      uses: aquasecurity/trivy-action@0.19.0
+      uses: aquasecurity/trivy-action@0.20.0
       with:
         image-ref: results.json
         scan-type: "convert"
