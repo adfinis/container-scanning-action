@@ -69,7 +69,7 @@ runs:
 
     - name: Install Cosign
       if: ${{ inputs.attest }}
-      uses: sigstore/cosign-installer@v3.7.0
+      uses: sigstore/cosign-installer@v3.8.1
 
     - name: Convert trivy results to cosign-vuln
       if: ${{ inputs.attest && !inputs.digest }}
