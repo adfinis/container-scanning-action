@@ -37,14 +37,14 @@ runs:
   using: composite
   steps:
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2
+      uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v3
       with:
         registry: ${{ inputs.registry }}
         username: ${{ github.actor }}
         password: ${{ inputs.token }}
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
       with:
         image-ref: ${{ inputs.image-ref }}
         format: "json"
@@ -52,7 +52,7 @@ runs:
         github-pat: ${{ inputs.token }}
 
     - name: Convert results to sarif
-      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
       with:
         image-ref: results.json
         scan-type: "convert"
@@ -62,18 +62,18 @@ runs:
         output: "results.sarif"
 
     - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@38697555549f1db7851b81482ff19f1fa5c4fedc
+      uses: github/codeql-action/upload-sarif@38697555549f1db7851b81482ff19f1fa5c4fedc # v0.35.0
       with:
         sarif_file: "results.sarif"
         token: ${{ inputs.token }}
 
     - name: Install Cosign
       if: ${{ inputs.attest }}
-      uses: sigstore/cosign-installer@ba7bc0a3fef59531c69a25acd34668d6d3fe6f22
+      uses: sigstore/cosign-installer@ba7bc0a3fef59531c69a25acd34668d6d3fe6f22 # v4.1.0
 
     - name: Convert trivy results to cosign-vuln
       if: ${{ inputs.attest && !inputs.digest }}
-      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
       with:
         image-ref: results.json
         scan-type: "convert"
@@ -95,7 +95,7 @@ runs:
 
     - name: Convert trivy results to cyclonedx
       if: ${{ inputs.attest && inputs.digest }}
-      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
+      uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
       with:
         image-ref: results.json
         scan-type: "convert"
