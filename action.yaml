@@ -62,7 +62,7 @@ runs:
         output: "results.sarif"
 
     - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@9e0d7b8d25671d64c341c19c0152d693099fb5ba # v0.35.0
+      uses: github/codeql-action/upload-sarif@e0647621c2984b5ed2f768cb892365bf2a616ad1 # v0.35.0
       with:
         sarif_file: "results.sarif"
         token: ${{ inputs.token }}
